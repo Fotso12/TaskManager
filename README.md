@@ -4,6 +4,8 @@
 
 ---
 
+## LIVRABLE 
+
 ## QUESTION 1 – CONCEPTION ARCHITECTURALE ET MODÉLISATION
 
 ### 1.1 Reformulation du besoin
@@ -64,6 +66,7 @@
 | PUT | `/api/v1/taches/{id}` | Modifier une tâche | 200 / 404 |
 | DELETE | `/api/v1/taches/{id}` | Supprimer une tâche | 200 / 404 |
 | GET | `/api/v1/utilisateurs` | Lister les utilisateurs | 200 OK |
+
 
 **Gestion d'erreurs :** `GlobalExceptionHandler` retourne des réponses `ApiResponse<>` uniformes.  
 **Versioning :** Préfixe `/api/v1/` dans tous les endpoints.
@@ -243,6 +246,10 @@ sonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 - Aucun secret en dur dans le code (utilisation des secrets GitHub Actions).
 - Dépendances maintenues à jour (Spring Boot 3.4.3, jjwt 0.11.5).
 - MySQL password vide en développement uniquement (variable d'environnement en prod).
+
+> [!CAUTION]
+> **SIMULATION DE FAILLE (EXAMEN) :** Une clé AWS fictive (`AKIA...`) a été volontairement ajoutée dans le fichier `src/main/resources/application.properties`. L'objectif est de démontrer que le pipeline CI/CD identifie et bloque les fuites de secrets via **Gitleaks**, empêchant ainsi la mise en production de code vulnérable.
+
 
 ---
 

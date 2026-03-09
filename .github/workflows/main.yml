@@ -139,32 +139,33 @@ jobs:
         id: image
         run: echo "image=${{ secrets.DOCKER_NAME }}/taskmanager:${{ github.sha }}" >> $GITHUB_OUTPUT
 
-  # ─────────────────────────────────────────────────────────
-  # Étape 5 : Déploiement sur le serveur distant via SSH
-  # Exécuté uniquement sur la branche main après build/push Docker
-  # ─────────────────────────────────────────────────────────
-  deploy:
-    needs: docker-build-push
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      # Connexion SSH au serveur et déploiement via docker-compose
-      - name: Deploy to remote server via SSH
-        uses: appleboy/ssh-action@v0.1.8
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script: |
-            set -e
-            echo "Connexion à Docker Hub..."
-            docker login -u ${{ secrets.DOCKER_NAME }} -p ${{ secrets.DOCKER_TOKEN }}
-            echo "Téléchargement de la nouvelle image..."
-            docker pull ${{ secrets.DOCKER_NAME }}/taskmanager:${{ github.sha }} || true
-            docker tag ${{ secrets.DOCKER_NAME }}/taskmanager:${{ github.sha }} ${{ secrets.DOCKER_NAME }}/taskmanager:latest || true
-            # Chemin vers le fichier docker-compose sur le serveur distant
-            REMOTE_COMPOSE=/opt/taskmanager/docker-compose.yml
-            echo "Redémarrage du service via docker-compose..."
-            docker-compose -f $REMOTE_COMPOSE pull app || true
-            docker-compose -f $REMOTE_COMPOSE up -d --no-deps --build app
+#  # ─────────────────────────────────────────────────────────
+#  # Étape 5 : Déploiement sur le serveur distant via SSH
+#  # Exécuté uniquement sur la branche main après build/push Docker
+#  # ─────────────────────────────────────────────────────────
+#  deploy:
+#    needs: docker-build-push
+#    runs-on: ubuntu-latest
+#    if: github.ref == 'refs/heads/main'
+#    steps:
+#      # Connexion SSH au serveur et déploiement via docker-compose
+#      - name: Deploy to remote server via SSH
+#        uses: appleboy/ssh-action@v0.1.8
+#        with:
+#          host: ${{ secrets.SSH_HOST }}
+#          username: ${{ secrets.SSH_USER }}
+#          key: ${{ secrets.SSH_PRIVATE_KEY }}
+#          port: ${{ secrets.SSH_PORT }}
+#          script: |
+#            set -e
+#            echo "Connexion à Docker Hub..."
+#            docker login -u ${{ secrets.DOCKER_NAME }} -p ${{ secrets.DOCKER_TOKEN }}
+#            echo "Téléchargement de la nouvelle image..."
+#            docker pull ${{ secrets.DOCKER_NAME }}/taskmanager:${{ github.sha }} || true
+#            docker tag ${{ secrets.DOCKER_NAME }}/taskmanager:${{ github.sha }} ${{ secrets.DOCKER_NAME }}/taskmanager:latest || true
+#            # Chemin vers le fichier docker-compose sur le serveur distant
+#            REMOTE_COMPOSE=/opt/taskmanager/docker-compose.yml
+#            echo "Redémarrage du service via docker-compose..."
+#            docker-compose -f $REMOTE_COMPOSE pull app || true
+#            docker-compose -f $REMOTE_COMPOSE up -d --no-deps --build app
+
