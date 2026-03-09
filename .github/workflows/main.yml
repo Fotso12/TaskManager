@@ -78,7 +78,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_NAME }}/taskmanager:${{ github.sha }} TaskManager/TaskManager
+          docker build -t ${{ secrets.DOCKER_NAME }}/taskmanager:${{ github.sha }} .
 
       - name: Login to Docker Hub
         run: |
