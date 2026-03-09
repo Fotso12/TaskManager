@@ -59,16 +59,18 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      # Compilation du projet pour générer target/classes (requis par SonarCloud)
-      - name: Compiler le projet
-        run: mvn -B compile
+      # Exécution des tests + génération du rapport de couverture JaCoCo
+      - name: Tests et couverture (JaCoCo)
+        run: mvn -B test
 
-      # Lancement de l'analyse SonarCloud via le plugin Maven (recommandé pour les projets Maven)
+      # Lancement de l'analyse SonarCloud via le plugin Maven
+      # sonar.coverage.jacoco.xmlReportPaths pointe vers le rapport généré par JaCoCo
       - name: SonarCloud Scan
         run: mvn -B sonar:sonar
           -Dsonar.projectKey=Fotso12_TaskManager
           -Dsonar.organization=fotso12
           -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
