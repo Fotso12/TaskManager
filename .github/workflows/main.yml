@@ -102,41 +102,43 @@ jobs:
           args: '--path=.'
 
   # ─────────────────────────────────────────────────────────
-  # Étape 4 : Construction et publication de l'image Docker
+  # Étape 4 : Construction de l'image Docker (Validation)
   # ─────────────────────────────────────────────────────────
-  docker-build-push:
-    needs: [build-and-test, security-scan]
+  docker-build:
+    needs: [sonarcloud, security-scan]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      # Récupération du code source
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Construction de l'image Docker taguée avec le SHA du commit
-      - name: Build Docker image
+      - name: Build Docker image (Verification)
         run: |
           docker build -t ${{ secrets.DOCKER_NAME }}/taskmanager:${{ github.sha }} .
 
-      # Connexion à Docker Hub avec les identifiants stockés en secrets
+  # ─────────────────────────────────────────────────────────
+  # Étape 5 : Déploiement (Publication sur Docker Hub)
+  # ─────────────────────────────────────────────────────────
+  deploy:
+    needs: docker-build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Login to Docker Hub
         run: |
           echo ${{ secrets.DOCKER_TOKEN }} | docker login -u ${{ secrets.DOCKER_NAME }} --password-stdin
 
-      # Publication de l'image taguée avec le SHA du commit
-      - name: Push image
+      - name: Build and Push image
         run: |
+          docker build -t ${{ secrets.DOCKER_NAME }}/taskmanager:${{ github.sha }} .
           docker push ${{ secrets.DOCKER_NAME }}/taskmanager:${{ github.sha }}
 
-      # Tag supplémentaire "latest" et publication
-      - name: Tag image as latest
+      - name: Tag and Push latest
         run: |
           docker tag ${{ secrets.DOCKER_NAME }}/taskmanager:${{ github.sha }} ${{ secrets.DOCKER_NAME }}/taskmanager:latest
           docker push ${{ secrets.DOCKER_NAME }}/taskmanager:latest
-
-      # Sauvegarde du nom de l'image dans les outputs du job pour réutilisation
-      - name: Set output image
-        id: image
-        run: echo "image=${{ secrets.DOCKER_NAME }}/taskmanager:${{ github.sha }}" >> $GITHUB_OUTPUT
 
 
