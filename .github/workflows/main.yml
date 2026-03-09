@@ -61,7 +61,7 @@ jobs:
 
       # Exécution des tests + génération du rapport de couverture JaCoCo
       - name: Tests et couverture (JaCoCo)
-        run: mvn -B test
+        run: mvn -B verify
 
       # Lancement de l'analyse SonarCloud via le plugin Maven
       # sonar.coverage.jacoco.xmlReportPaths pointe vers le rapport généré par JaCoCo
