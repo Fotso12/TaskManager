@@ -30,7 +30,8 @@ public class TacheController {
     public ResponseEntity<ApiResponse<TacheResponse>> creerTache(
             @Valid @RequestBody TacheRequest request,
             Authentication authentication) {
-        TacheResponse response = tacheService.creer(request, authentication.getName());
+        String username = authentication != null ? authentication.getName() : "";
+        TacheResponse response = tacheService.creer(request, username);
         return new ResponseEntity<>(new ApiResponse<>(true, "Tâche créée avec succès", response), HttpStatus.CREATED);
     }
 
@@ -40,7 +41,8 @@ public class TacheController {
             @Parameter(description = "Numéro de la page (0 par défaut)") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Nombre d'éléments par page (10 par défaut)") @RequestParam(defaultValue = "10") int size,
             Authentication authentication) {
-        Page<TacheResponse> taches = tacheService.obtenirToutes(page, size, authentication.getName());
+        String username = authentication != null ? authentication.getName() : "";
+        Page<TacheResponse> taches = tacheService.obtenirToutes(page, size, username);
         return ResponseEntity.ok(new ApiResponse<>(true, "Tâches récupérées avec succès", taches));
     }
 
@@ -48,7 +50,8 @@ public class TacheController {
     public ResponseEntity<ApiResponse<TacheResponse>> obtenirTacheParId(
             @PathVariable Integer id,
             Authentication authentication) {
-        TacheResponse tache = tacheService.obtenirParId(id, authentication.getName());
+        String username = authentication != null ? authentication.getName() : "";
+        TacheResponse tache = tacheService.obtenirParId(id, username);
         return ResponseEntity.ok(new ApiResponse<>(true, "Tâche récupérée avec succès", tache));
     }
 
@@ -57,7 +60,8 @@ public class TacheController {
             @PathVariable Integer id,
             @Valid @RequestBody TacheRequest request,
             Authentication authentication) {
-        TacheResponse tache = tacheService.modifier(id, request, authentication.getName());
+        String username = authentication != null ? authentication.getName() : "";
+        TacheResponse tache = tacheService.modifier(id, request, username);
         return ResponseEntity.ok(new ApiResponse<>(true, "Tâche modifiée avec succès", tache));
     }
 
@@ -65,7 +69,8 @@ public class TacheController {
     public ResponseEntity<ApiResponse<Void>> supprimerTache(
             @PathVariable Integer id,
             Authentication authentication) {
-        tacheService.supprimer(id, authentication.getName());
+        String username = authentication != null ? authentication.getName() : "";
+        tacheService.supprimer(id, username);
         return ResponseEntity.ok(new ApiResponse<>(true, "Tâche supprimée avec succès", null));
     }
 }

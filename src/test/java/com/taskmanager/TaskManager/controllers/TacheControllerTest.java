@@ -1,13 +1,14 @@
 package com.taskmanager.TaskManager.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.taskmanager.TaskManager.config.JwtService;
 import com.taskmanager.TaskManager.dtos.request.TacheRequest;
 import com.taskmanager.TaskManager.dtos.response.TacheResponse;
+import com.taskmanager.TaskManager.repositories.UtilisateurRepository;
 import com.taskmanager.TaskManager.services.ITacheService;
 import com.taskmanager.TaskManager.utils.StatutTacheEnum;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -26,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = TacheController.class, excludeAutoConfiguration = SecurityAutoConfiguration.class)
+@WebMvcTest(controllers = TacheController.class)
 public class TacheControllerTest {
 
     @Autowired
@@ -37,6 +38,12 @@ public class TacheControllerTest {
 
     @MockitoBean
     private ITacheService tacheService;
+
+    @MockitoBean
+    private UtilisateurRepository utilisateurRepository;
+
+    @MockitoBean
+    private JwtService jwtService;
 
     @Test
     public void testCreerTache_Success() throws Exception {
