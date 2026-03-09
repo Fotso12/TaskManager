@@ -45,7 +45,7 @@ jobs:
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
         with:
-          projectBaseDir: TaskManager/TaskManager
+          projectBaseDir: .
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
@@ -56,13 +56,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Trivy Scan (Docker image)
+      - name: Trivy Scan (filesystem)
         uses: aquasecurity/trivy-action@master
         with:
           format: 'table'
           exit-code: '0'
-          scan-type: 'image'
-          image-ref: 'taskmanager/app:latest'
+          scan-type: 'fs'
+          scan-ref: '.'
 
       - name: Gitleaks Scan
         uses: zricethezav/gitleaks-action@v1
