@@ -59,14 +59,19 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      # Lancement de l'analyse SonarCloud
+      # Compilation du projet pour générer target/classes (requis par SonarCloud)
+      - name: Compiler le projet
+        run: mvn -B compile
+
+      # Lancement de l'analyse SonarCloud via le plugin Maven (recommandé pour les projets Maven)
       - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@master
-        with:
-          projectBaseDir: .
+        run: mvn -B sonar:sonar
+          -Dsonar.projectKey=Fotso12_TaskManager
+          -Dsonar.organization=fotso12
+          -Dsonar.host.url=https://sonarcloud.io
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
+
 
   # ─────────────────────────────────────────────────────────
   # Étape 3 : Analyse de sécurité (Trivy + Gitleaks)
