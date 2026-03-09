@@ -253,32 +253,60 @@ sonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
 ---
 
-## QUESTION 5 – DÉPLOIEMENT AUTOMATIQUE
+## QUESTION 5 – DÉPLOIEMENT ET AUTOMATISATION 🤖
 
-### Architecture de déploiement
+### 5.1 Synthèse de l'automatisation
+L'ensemble du cycle de vie de l'application est automatisé pour un déploiement "zéro friction". Pour plus de détails techniques, consultez le fichier [AUTOMATION.md](file:///c:/Users/Darryl/Desktop/EXAM/TaskManager/TaskManager/AUTOMATION.md).
+
+**Fonctionnement global :**
+1. **CI/CD (GitHub)** : Chaque push compile, test et publie une image Docker sur Docker Hub.
+2. **CD (Local)** : Un conteneur **Watchtower** surveille les mises à jour et redéploie l'application automatiquement en local.
+
+### 5.2 Architecture Technique (Local)
 
 ```yaml
-# docker-compose.yml sur le serveur
+# Extrait du docker-compose.yml
 services:
   app:
-    image: dockerhub_user/taskmanager:latest
+    image: darryl1234/taskmanager:latest
     ports:
-      - "8082:8082"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/taskmanager
-    restart: always   # Redémarrage automatique
-  db:
-    image: mysql:8
+      - "8081:8080"
+    restart: always
+  
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 60 --cleanup --label-enable
     restart: always
 ```
 
-### Processus automatisé
+### 5.2 Processus Automatisé
 
-1. **Build** : `docker build -t user/taskmanager:${SHA} .`
-2. **Tag** : SHA du commit + `latest`
-3. **Push** : Docker Hub
-4. **Deploy** : SSH → `docker-compose pull app && docker-compose up -d`
-5. **Restart** : `restart: always` assure le redémarrage automatique
+1.  **Push (GitHub)** : Chaque push sur `main` déclenche le pipeline.
+2.  **Conteneurisation** : L'image est construite, taguée (`latest` + SHA) et poussée sur **Docker Hub**.
+3.  **Surveillance (Local)** : Le conteneur **Watchtower** installé localement vérifie Docker Hub toutes les 60 secondes.
+4.  **Mise à jour Auto** : Si une nouvelle image est détectée, Watchtower l'arrête, télécharge la nouvelle version et redémarre l'application.
+
+### 5.3 Guide de démarrage rapide (Déploiement)
+
+```bash
+# 1. Lancer l'infrastructure (Watchtower + App + DB)
+docker-compose up -d
+
+# 2. Vérifier que Watchtower surveille bien l'app
+docker logs -f watchtower
+
+# 3. Accéder à l'application
+# URL : http://localhost:8081
+```
+
+### 5.4 Vérification de la réussite
+
+*   **GitHub Actions** : Coche verte sur le dernier commit.
+*   **Docker Desktop** : Image `darryl1234/taskmanager` créée il y a quelques minutes.
+*   **Logs Watchtower** : Présence de `Found new image, stopping, starting...`.
 
 ---
 
